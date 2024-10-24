@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
 const total = new Map();
 app.get('/total', (req, res) => {
   const data = Array.from(total.values()).map((link, index)  => ({
