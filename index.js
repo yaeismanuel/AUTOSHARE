@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 const total = new Map();
 app.get('/total', (req, res) => {
   const data = Array.from(total.values()).map((link, index)  => ({
@@ -15,6 +16,9 @@ app.get('/total', (req, res) => {
     target: link.target,
   }));
   res.json(JSON.parse(JSON.stringify(data || [], null, 2)));
+});
+app.get('/', (res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 app.post('/api/submit', async (req, res) => {
   const {
