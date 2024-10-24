@@ -2,31 +2,33 @@ const express = require('express');
 const axios = require('axios');
 const path = require('path');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
 const total = new Map();
+
 app.get('/total', (req, res) => {
-  const data = Array.from(total.values()).map((link, index)  => ({
+  const data = Array.from(total.values()).map((link, index) => ({
     session: index + 1,
     url: link.url,
     count: link.count,
     id: link.id,
     target: link.target,
   }));
-  res.json(JSON.parse(JSON.stringify(data || [], null, 2)));
+  res.json(data);
 });
-app.get('/', (res) => {
+
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+
 app.post('/api/submit', async (req, res) => {
-  const {
-    cookie,
-    url,
-    amount,
-    interval,
-  } = req.body;
+  const { cookie, url, amount, interval } = req.body;
   if (!cookie || !url || !amount || !interval) return res.status(400).json({
     error: 'Missing state, url, amount, or interval'
   });
@@ -37,8 +39,8 @@ app.post('/api/submit', async (req, res) => {
         status: 500,
         error: 'Invalid cookies'
       });
-    };
-    await share(cookies, url, amount, interval)
+    }
+    await share(cookies, url, amount, interval);
     res.status(200).json({
       status: 200
     });
@@ -100,6 +102,7 @@ async function share(cookies, url, amount, interval) {
     total.delete(postId);
   }, amount * interval * 1000);
 }
+
 async function getPostID(url) {
   try {
     const response = await axios.post('https://id.traodoisub.com/api.php', `link=${encodeURIComponent(url)}`, {
@@ -112,6 +115,7 @@ async function getPostID(url) {
     return;
   }
 }
+
 async function getAccessToken(cookie) {
   try {
     const headers = {
@@ -142,6 +146,7 @@ async function getAccessToken(cookie) {
     return;
   }
 }
+
 async function convertCookie(cookie) {
   return new Promise((resolve, reject) => {
     try {
@@ -158,4 +163,5 @@ async function convertCookie(cookie) {
     }
   });
 }
-app.listen(5000)
+
+app.listen(5000);
