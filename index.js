@@ -17,9 +17,6 @@ app.get('/total', (req, res) => {
   }));
   res.json(JSON.parse(JSON.stringify(data || [], null, 2)));
 });
-app.get('/', (res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
 app.post('/api/submit', async (req, res) => {
   const {
     cookie,
