@@ -40,7 +40,7 @@ app.post('/api/submit', async (req, res) => {
     await startShareSession(cookies, url, amount, interval);
     res.status(200).json({ status: 200 });
   } catch (err) {
-    return res.status(500).json({ status: 500, error: err.message || err });
+    res.status(500).json({ status: 500, error: err.message || err });
   }
 });
 
@@ -55,12 +55,12 @@ async function startShareSession(cookies, url, amount, interval) {
   activeSessions.set(sessionId, { url, id, count: 0, target: amount });
 
   const headers = {
-    'accept': '*/*',
+    accept: '*/*',
     'accept-encoding': 'gzip, deflate',
-    'connection': 'keep-alive',
+    connection: 'keep-alive',
     'content-length': '0',
-    'cookie': cookies,
-    'host': 'graph.facebook.com',
+    cookie: cookies,
+    host: 'graph.facebook.com',
   };
 
   let sharedCount = 0;
@@ -70,10 +70,11 @@ async function startShareSession(cookies, url, amount, interval) {
     try {
       const response = await axios.post(`https://graph.facebook.com/me/feed?link=https://m.facebook.com/${id}&published=0&access_token=${accessToken}`, {}, { headers });
       if (response.status === 200) {
-        activeSessions.set(sessionId, {
-          ...activeSessions.get(sessionId),
-          count: activeSessions.get(sessionId).count + 1,
-        });
+        const session = activeSessions.get(sessionId);
+        if (session) {
+          session.count++;
+          activeSessions.set(sessionId, session);
+        }
         sharedCount++;
       }
       if (sharedCount >= amount) {
@@ -99,7 +100,7 @@ async function getPostID(url) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
     return response.data.id;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -107,34 +108,29 @@ async function getPostID(url) {
 async function getAccessToken(cookie) {
   try {
     const headers = {
-      'authority': 'business.facebook.com',
-      'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-      'cookie': cookie,
-      'referer': 'https://www.facebook.com/',
+      authority: 'business.facebook.com',
+      accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+      cookie: cookie,
+      referer: 'https://www.facebook.com/',
     };
     const response = await axios.get('https://business.facebook.com/content_management', { headers });
     const token = response.data.match(/"accessToken":\s*"([^"]+)"/);
     return token ? token[1] : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
 
 async function convertCookie(cookie) {
-  return new Promise((resolve, reject) => {
-    try {
-      const cookies = JSON.parse(cookie);
-      const sbCookie = cookies.find(c => c.key === "sb");
-      if (!sbCookie) {
-        reject("Invalid appstate. Please provide a valid appstate.");
-      }
-      const sbValue = sbCookie.value;
-      const data = `sb=${sbValue}; ${cookies.slice(1).map(c => `${c.key}=${c.value}`).join('; ')}`;
-      resolve(data);
-    } catch (error) {
-      reject("Error processing appstate. Please provide a valid appstate.");
-    }
-  });
+  try {
+    const cookies = JSON.parse(cookie);
+    const sbCookie = cookies.find(c => c.key === "sb");
+    if (!sbCookie) throw new Error("Invalid appstate. Please provide a valid appstate.");
+    const sbValue = sbCookie.value;
+    return `sb=${sbValue}; ${cookies.slice(1).map(c => `${c.key}=${c.value}`).join('; ')}`;
+  } catch {
+    throw new Error("Error processing appstate. Please provide a valid appstate.");
+  }
 }
 
 app.listen(5000, () => {
