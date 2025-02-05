@@ -52,81 +52,41 @@
       </div>
       <style>
          body, html {
-         margin: 0;
-         }
-         body {
-         padding: 20px;
-         font-family: 'Poppins', sans-serif;
-         background: #000;
-         color: #898989;
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         }
-         .container {
-         background-color: #0a0a0a;
-         border-radius: 10px;
-         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-         padding: 20px;
-         margin: 20px auto;
-         overflow: auto;
-         }
-         .form-item {
-         padding: 8px;
-         }
-         h1 {
-         color: #343a40;
-         }
-         .form-item label {
-         font-size: 13px;
-         color: #495057;
-         margin-bottom: 5px; 
-         display: block; 
-         }
-         input, button {
-         background: #000;
-         color: #fff; 
-         border: solid 1px #222;
-         box-sizing: border-box;
-         width: 100%;
-         margin-bottom: 10px;
-         padding: 10px;
-         border-radius: 4px;
-         font-size: 16px;
-         }
-         button {
-         cursor: none;
-         color: #0a0a0a;
-         background-color: #ededed;
-         }
-         button:hover {
-         background: #CCC;
-         }
-         #result {
-         display: none;
-         text-align: center;
-         background-color: #ededed;
-         border: solid 1px #222;
-         padding: 10px;
-         border-radius: 4px;
-         color: #0a0a0a;
-         }
-         #process {
-         }
-         .current-online {
-         font-size: 13px;
-         background: #0a0a0a;
-         padding: 10px;
-         color: #898989;
-         border: solid 1px #898989;
-         border-radius: 4px;
-         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-         margin-bottom: 10px;
-         overflow: auto;
-         white-space: nowrap; 
-         }
-      </style>
-      <script>
+              body {
+            font-family: Arial, sans-serif;
+            background-color: #f0e68c;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        h1 {
+            color: #b45c00;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            border: 2px solid #b45c00;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #b45c00;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #a65000;
+        }
+    </style>
+</head>    
          async function submitForm() {
            event.preventDefault();
            const result = document.getElementById('result');
